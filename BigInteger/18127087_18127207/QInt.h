@@ -1,10 +1,14 @@
 #pragma once
 #include <iostream>
+#include <bitset>
+#include <string>
+
+using namespace std;
 
 class QInt
 {
 private:
-	__int64 arrayBits[2] = { 0 };
+	bitset<128> arrayBits; 
 
 public:
 
