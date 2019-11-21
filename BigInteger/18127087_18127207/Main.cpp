@@ -1,5 +1,4 @@
 #include "QInt.h"
-
 int main(int argc, char* argv[]) {
 	if (argc == 3) cout << "Cha may";
 	else if (argc < 3) cout << "Me may";
