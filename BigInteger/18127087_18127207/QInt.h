@@ -29,8 +29,8 @@ public:
 
 	// Binary Operators
 	// Arithmetic
-	//QInt operator+(const QInt&);
-	//QInt operator-(const QInt&);
+	QInt operator+(const QInt&);
+	QInt operator-(const QInt&);
 	//QInt operator*(const QInt&);
 	//QInt operator/(const QInt&);
 

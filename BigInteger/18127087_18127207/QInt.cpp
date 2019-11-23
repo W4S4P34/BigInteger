@@ -1,45 +1,61 @@
 #include "QInt.h"
 //Support Operators
-QInt& QInt::operator=(const QInt& a) {
-	QInt b;
-	for (int i = 0; i < a.arrayBits.size(); i++) {
-		b.arrayBits[i] = a.arrayBits[i];
-	}
-	return b;
+QInt& QInt::operator=(const QInt& Qi) {
+	QInt tempQi;
+	tempQi.arrayBits = Qi.arrayBits;
+	return tempQi;
 }
 
 //Bitwise
 QInt QInt::operator~() {
-	QInt b;
-	for (int i = 0; i < b.arrayBits.size() - 1; i++) {
-		~b.arrayBits[i];
-	}
-	return b;
+	QInt tempQi;
+	tempQi.arrayBits.flip();
+	return tempQi;
 }
 
-QInt QInt::operator&(const QInt& a) {
-	QInt b;
-	QInt c;
-	for (int i = 0; i < a.arrayBits.size() - 1; i++) {
-		c.arrayBits[i] = b.arrayBits[i] & a.arrayBits[i];
+// Binary Operators
+// Arithmetic
+QInt QInt::operator+(const QInt& Qi) {
+	bitset<1> temp = { 0 };
+	QInt tempQi;
+	for (int i = Qi.arrayBits.size() - 1; i >= 0; i--) {
+		tempQi.arrayBits[i] = (this->arrayBits[i] ^ Qi.arrayBits[i]) + temp[0];
+		if (this->arrayBits[i] == Qi.arrayBits[i]) {
+			if ((temp[0] == 1 && Qi.arrayBits[i] == 0) || temp[0] == 0 && Qi.arrayBits[i] == 1) 
+				temp.flip();
+		}
 	}
-	return c;
+	return tempQi;
 }
 
-QInt QInt::operator|(const QInt& a) { 
-	QInt b;
-	QInt c;
-	for (int i = 0; i < a.arrayBits.size() - 1; i++) {
-		c.arrayBits[i] = b.arrayBits[i] | a.arrayBits[i];
+QInt QInt::operator-(const QInt& Qi) {
+	QInt tempQi1, OneComplement, temp;
+	OneComplement = Qi;
+	temp.arrayBits.set(0, 1);
+	OneComplement.arrayBits.flip();
+	tempQi1 = temp + OneComplement;
+	return tempQi1;
+}
+QInt QInt::operator&(const QInt& Qi) {
+	QInt tempQi;
+	for (int i = 0; i < Qi.arrayBits.size(); i++) {
+		tempQi.arrayBits[i] = this->arrayBits[i] & Qi.arrayBits[i];
 	}
-	return c;
+	return tempQi;
 }
 
-QInt QInt::operator^(const QInt& a) {
-	QInt b;
-	QInt c;
-	for (int i = 0; i < a.arrayBits.size() - 1; i++) {
-		c.arrayBits[i] = b.arrayBits[i] ^ a.arrayBits[i];
+QInt QInt::operator|(const QInt& Qi) {
+	QInt tempQi;
+	for (int i = 0; i < Qi.arrayBits.size(); i++) {
+		tempQi.arrayBits[i] = this->arrayBits[i] | Qi.arrayBits[i];
 	}
-	return c;
+	return tempQi;
+}
+
+QInt QInt::operator^(const QInt& Qi) {
+	QInt tempQi;
+	for (int i = 0; i < Qi.arrayBits.size(); i++) {
+		tempQi.arrayBits[i] = this->arrayBits[i] ^ Qi.arrayBits[i];
+	}
+	return tempQi;
 }
