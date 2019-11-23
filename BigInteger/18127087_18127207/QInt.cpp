@@ -29,12 +29,13 @@ QInt QInt::operator+(const QInt& Qi) {
 }
 
 QInt QInt::operator-(const QInt& Qi) {
-	QInt tempQi1, OneComplement, temp;
+	QInt tempQi, OneComplement, temp, TwoComplement;
 	OneComplement = Qi;
 	temp.arrayBits.set(0, 1);
 	OneComplement.arrayBits.flip();
-	tempQi1 = temp + OneComplement;
-	return tempQi1;
+	TwoComplement = temp + OneComplement;
+	tempQi = *this + TwoComplement;
+	return tempQi;
 }
 QInt QInt::operator&(const QInt& Qi) {
 	QInt tempQi;
