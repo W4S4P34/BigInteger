@@ -21,7 +21,7 @@ QInt QInt::operator+(const QInt& Qi) {
 	for (int i = Qi.arrayBits.size() - 1; i >= 0; i--) {
 		tempQi.arrayBits[i] = (this->arrayBits[i] ^ Qi.arrayBits[i]) + temp[0];
 		if (this->arrayBits[i] == Qi.arrayBits[i]) {
-			if ((temp[0] == 1 && Qi.arrayBits[i] == 0) || temp[0] == 0 && Qi.arrayBits[i] == 1) 
+			if ((temp[0] == 1 && Qi.arrayBits[i] == 0) || (temp[0] == 0 && Qi.arrayBits[i] == 1)) 
 				temp.flip();
 		}
 	}
