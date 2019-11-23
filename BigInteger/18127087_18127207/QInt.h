@@ -16,9 +16,21 @@ public:
 	QInt(const QInt&);
 
 	// Base Conversion Methods
-	void toBase2(string base);
+	void toBase2_10(string base);
+	void toBase2_16(string base);
 	string toBase10();
 	string toBase16();
+
+	// Support Conversion Methods
+	// Set/Get Property
+	string getBits();
+
+	// From 10 To 2 Methods
+	bool oddsToOne(string base);
+	string divideByTwo(string base);
+
+	// From 16 To 2 Methods
+	string convertOneHexToBin(char base);
 
 	// Unary Operators
 	// Support Operators
