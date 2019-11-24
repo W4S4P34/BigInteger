@@ -6,9 +6,12 @@ QInt::QInt()
 
 }
 
-QInt::QInt(const QInt&)
+QInt::QInt(const QInt& qi)
 {
-
+	for (int i = 0; i < 128; i++)
+	{
+		this->arrayBits[i] = qi.arrayBits[i];
+	}
 }
 
 // Base Conversion Methods
@@ -61,7 +64,29 @@ string QInt::toBase10()
 
 string QInt::toBase16()
 {
-	return "0";
+	string newString; string tempString;
+
+	for (int i = 124; i >= 0; i -= 4)
+	{
+		tempString.clear();
+		for (int j = i; j <= i + 3; j++)
+		{
+			tempString.append(to_string(this->arrayBits[j]));
+		}
+		newString.assign(convertBinChunkToHex(tempString) + newString);
+	}
+
+	size_t found = newString.find_first_not_of("0");
+
+	if (found != string::npos)
+	{
+		newString.erase(0, found);
+		return newString;
+	}
+	else
+	{
+		return "0";
+	}
 }
 
 // Support Conversion Methods
@@ -75,7 +100,7 @@ string QInt::getBits()
 		tempString.append(to_string(arrayBits[i]));
 	}
 
-	size_t found = tempString.find_first_of("1");
+	size_t found = tempString.find_first_not_of("0");
 
 	if (found != string::npos)
 	{
@@ -128,7 +153,6 @@ string QInt::convertOneHexToBin(char base)
 {
 	switch (base)
 	{
-	case '0': { return "0000"; break; }
 	case '1': { return "0001"; break; }
 	case '2': { return "0010"; break; }
 	case '3': { return "0011"; break; }
@@ -146,4 +170,25 @@ string QInt::convertOneHexToBin(char base)
 	case 'F': { return "1111"; break; }
 	default: { return "0000"; break; }
 	}
+}
+
+// From 2 To 16 Methods
+string QInt::convertBinChunkToHex(string chunk)
+{
+	if (chunk == "0001") return "1";
+	else if (chunk == "0010") return "2";
+	else if (chunk == "0011") return "3";
+	else if (chunk == "0100") return "4";
+	else if (chunk == "0101") return "5";
+	else if (chunk == "0110") return "6";
+	else if (chunk == "0111") return "7";
+	else if (chunk == "1000") return "8";
+	else if (chunk == "1001") return "9";
+	else if (chunk == "1010") return "A";
+	else if (chunk == "1011") return "B";
+	else if (chunk == "1100") return "C";
+	else if (chunk == "1101") return "D";
+	else if (chunk == "1110") return "F";
+	else if (chunk == "1111") return "G";
+	else return "0";
 }
