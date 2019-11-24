@@ -14,6 +14,8 @@ QInt::QInt(const QInt& qi)
 	}
 }
 
+/*************************************************************************/
+
 // Base Conversion Methods
 void QInt::toBase2_10(string base)
 {
@@ -59,7 +61,80 @@ void QInt::toBase2_16(string base)
 
 string QInt::toBase10()
 {
-	return "0";
+	string tempString;
+	string newString(39, '0');
+	// Create Summary Table
+	char** conversionTable = new char* [128];
+	for (int i = 0; i < 128; i++)
+	{
+		if (this->arrayBits[127 - i])
+		{
+			tempString.assign(powerOfTwo(i));
+		}
+		else tempString.assign(39, '0');
+
+		conversionTable[i] = new char[39]();
+		for (int j = 0; j < 39; j++)
+		{
+			conversionTable[i][j] = tempString[j];
+		}
+	}
+
+	// Sum the result
+	int carryElement = 0, carryCapacity = 0;
+	int tempResult = 0;
+	int result[39] = { 0 };
+
+	for (int i = 38; i >= 0; i--)
+	{
+		tempResult = 0;
+		for (int j = 0; j < 127; j++)
+		{
+			tempResult += conversionTable[j][i] - 48;
+		}
+		carryCapacity += tempResult; carryElement = carryCapacity % 10; carryCapacity /= 10;
+		result[i] = carryElement;
+	}
+
+	// Copy to string
+	for (int i = 0; i < 39; i++)
+	{
+		newString.replace(i, 1, to_string(result[i]));
+	}
+
+	// Delete zeros
+	size_t found = newString.find_first_not_of("0");
+
+	if (found != string::npos)
+	{
+		newString.erase(0, found);
+
+		// Check whether number positive or negative
+		if (this->arrayBits[0])
+		{
+			newString.assign("-" + newString);
+		}
+
+		// Delete Summary Table
+		for (int i = 0; i < 128; i++)
+		{
+			delete[] conversionTable[i];
+		}
+		delete[] conversionTable;
+
+		return newString;
+	}
+	else
+	{
+		// Delete Summary Table
+		for (int i = 0; i < 128; i++)
+		{
+			delete[] conversionTable[i];
+		}
+		delete[] conversionTable;
+
+		return "0";
+	}
 }
 
 string QInt::toBase16()
@@ -172,6 +247,49 @@ string QInt::convertOneHexToBin(char base)
 	}
 }
 
+// From 2 to 10 Methods
+string QInt::powerOfTwo(int power)
+{
+	string tempString(39, '0');
+	tempString.replace(38, 1, "1");
+
+	if (power == 0)
+	{
+		return tempString;
+	}
+	else
+	{
+		int stringIndex = 38;
+		int carryElement = 0;
+		int temp = 0;
+
+		while (power != 0)
+		{
+			stringIndex = 38;
+			while (stringIndex != 0)
+			{
+				temp = 2 * (tempString[stringIndex] - 48) + carryElement;
+
+				if (tempString[stringIndex] - 48 >= 5)
+				{
+					carryElement = 1;
+				}
+				else
+				{
+					carryElement = 0;
+				}
+
+				tempString.replace(stringIndex, 1, to_string(temp % 10));
+
+				stringIndex--;
+			}
+			power--;
+		}
+
+		return tempString;
+	}
+}
+
 // From 2 To 16 Methods
 string QInt::convertBinChunkToHex(string chunk)
 {
@@ -192,3 +310,5 @@ string QInt::convertBinChunkToHex(string chunk)
 	else if (chunk == "1111") return "G";
 	else return "0";
 }
+
+/*************************************************************************/

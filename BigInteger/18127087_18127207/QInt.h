@@ -32,6 +32,9 @@ public:
 	// From 16 To 2 Methods
 	string convertOneHexToBin(char base);
 
+	// From 2 to 10 Methods
+	string powerOfTwo(int power);
+
 	// From 2 To 16 Methods
 	string convertBinChunkToHex(string chunk);
 
