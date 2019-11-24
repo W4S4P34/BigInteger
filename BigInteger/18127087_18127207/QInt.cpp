@@ -17,9 +17,18 @@ void QInt::toBase2_10(string base)
 	if (base == "0") return;
 	else
 	{
+		// Erase the minus "-"
+		if (base[0] == '-')
+		{
+			this->arrayBits.set(0);
+			base.erase(0, 1);
+		}
+
 		int i = 127; bool mode = 0;
 		while (base != "0")
 		{
+			if (i == 0) break;
+
 			mode = oddsToOne(base);
 			this->arrayBits.set(i--, mode);
 			base.assign(divideByTwo(base));
@@ -99,7 +108,7 @@ string QInt::divideByTwo(string base)
 	int newDigit = 0;
 	int addMod = 0;
 
-	for (int i = 0; i < base.length(); i++)
+	for (int i = 0; i < (int)base.length(); i++)
 	{
 		newDigit = (int)((base[i] - '0') / 2) + addMod;
 		newString.assign(newString + to_string(newDigit));
@@ -137,41 +146,4 @@ string QInt::convertOneHexToBin(char base)
 	case 'F': { return "1111"; break; }
 	default: { return "0000"; break; }
 	}
-}
-
-// Bitwise
-QInt QInt::operator&(const QInt& qi) 
-{
-	QInt tempQi;
-
-	for (int i = 0; i < qi.arrayBits.size(); i++) 
-	{
-		tempQi.arrayBits[i] = this->arrayBits[i] & qi.arrayBits[i];
-	}
-
-	return tempQi;
-}
-
-QInt QInt::operator|(const QInt& a) {
-	QInt b;
-	QInt c;
-	for (int i = 0; i < a.arrayBits.size() - 1; i++) {
-		c.arrayBits[i] = b.arrayBits[i] | a.arrayBits[i];
-	}
-	return c;
-}
-QInt QInt::operator^(const QInt& a) {
-	QInt b;
-	QInt c;
-	for (int i = 0; i < a.arrayBits.size() - 1; i++) {
-		c.arrayBits[i] = b.arrayBits[i] ^ a.arrayBits[i];
-	}
-	return c;
-}
-QInt QInt::operator~() {
-	QInt b;
-	for (int i = 0; i < b.arrayBits.size() - 1; i++) {
-		~b.arrayBits[i];
-	}
-	return b;
 }
