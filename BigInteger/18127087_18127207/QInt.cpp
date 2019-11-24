@@ -132,7 +132,7 @@ string QInt::toBase10()
 				carryCapacity = temp / 10;
 				if (i > 0)
 				{
-					result[i - 1] += 1;
+					result[i - 1] += carryCapacity;
 				}
 			}
 			else
