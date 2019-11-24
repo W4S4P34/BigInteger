@@ -22,10 +22,11 @@ void QInt::toBase2_10(string base)
 	if (base == "0") return;
 	else
 	{
+		bool negativeFlag = false;
 		// Erase the minus "-"
 		if (base[0] == '-')
 		{
-			this->arrayBits.set(0);
+			negativeFlag = true;
 			base.erase(0, 1);
 		}
 
@@ -37,6 +38,29 @@ void QInt::toBase2_10(string base)
 			mode = oddsToOne(base);
 			this->arrayBits.set(i--, mode);
 			base.assign(divideByTwo(base));
+		}
+
+		if (negativeFlag)
+		{
+			bool carryBit = false;
+			this->arrayBits.flip();
+			if (this->arrayBits[127] == 0)
+			{
+				this->arrayBits.set(127, true);
+			}
+			else
+			{
+				int i = 127;
+				do
+				{
+					if (this->arrayBits[i] == 1)
+					{
+						carryBit = true;
+						this->arrayBits.set(i, false);
+					}
+					i--;
+				} while (carryBit && i >= 0);
+			}
 		}
 	}
 }
@@ -94,6 +118,33 @@ string QInt::toBase10()
 		}
 		carryCapacity += tempResult; carryElement = carryCapacity % 10; carryCapacity /= 10;
 		result[i] = carryElement;
+	}
+
+	int temp = 0;
+	carryElement = 0; carryCapacity = 0;
+	if (this->arrayBits[0])
+	{
+		for (int i = 38; i >= 0; i--)
+		{
+			if ((conversionTable[127][i] - 48) < result[i])
+			{
+				temp = (conversionTable[127][i] - 48) + 10;
+				carryCapacity = temp / 10;
+				if (i > 0)
+				{
+					result[i - 1] += 1;
+				}
+			}
+			else
+			{
+				temp = (conversionTable[127][i] - 48);
+				carryCapacity = 0;
+			}
+
+			tempResult = temp - result[i];
+
+			result[i] = tempResult;
+		}
 	}
 
 	// Copy to string
