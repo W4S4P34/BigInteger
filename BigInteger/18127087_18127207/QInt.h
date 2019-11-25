@@ -37,8 +37,8 @@ public:
 	//// Bitwise
 	QInt operator<<(const uint8_t&);
 	QInt operator>>(const uint8_t&);
-	//QInt rol();
-	//QInt ror();
+	QInt rol();
+	QInt ror();
 
 	QInt operator& (const QInt&);
 	QInt operator| (const QInt&);

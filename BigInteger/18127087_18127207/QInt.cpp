@@ -1,4 +1,17 @@
 #include "QInt.h"
+
+QInt::QInt()
+{
+
+}
+
+QInt::QInt(const QInt& qi)
+{
+	for (int i = 0; i < 128; i++)
+	{
+		this->arrayBits[i] = qi.arrayBits[i];
+	}
+}
 //Support Operators
 QInt& QInt::operator=(const QInt& Qi) {
 	QInt tempQi;
@@ -56,7 +69,7 @@ QInt QInt::operator-(const QInt& Qi) {
 
 QInt QInt::operator<<(const uint8_t& n) {
 	QInt temp = *this;
-	for (int i = 0; i < (int)temp.arrayBits.size(); i++) {
+	for (uint8_t i = 0; i < (uint8_t)temp.arrayBits.size(); i++) {
 		if ((i + n) > temp.arrayBits.size() - 1) {
 			temp.arrayBits.set(i, 0);
 			continue;
@@ -99,7 +112,20 @@ QInt QInt::operator|(const QInt& Qi) {
 	}
 	return tempQi;
 }
-
+QInt QInt::ror() {
+	QInt tempQi;
+	int carryBit = this->arrayBits[127];
+	tempQi = *this >> 1;
+	tempQi.arrayBits.set(0, carryBit);
+	return tempQi;
+}
+QInt QInt::rol() {
+	QInt tempQi;
+	int carryBit = this->arrayBits[0];
+	tempQi = *this << 1;
+	tempQi.arrayBits.set(127, carryBit);
+	return tempQi;
+}
 QInt QInt::operator^(const QInt& Qi) {
 	QInt tempQi;
 	for (int i = 0; i < Qi.arrayBits.size(); i++) {
