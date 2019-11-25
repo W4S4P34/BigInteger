@@ -400,6 +400,17 @@ QInt QInt::operator+(const QInt& Qi)
 	return tempQi;
 }
 
+QInt QInt::operator-(const QInt& Qi) 
+{
+	QInt tempQi, OneComplement, temp, TwoComplement;
+	OneComplement = Qi;
+	temp.arrayBits.set(127, 1);
+	OneComplement.arrayBits.flip();
+	TwoComplement = temp + OneComplement;
+	tempQi = *this + TwoComplement;
+	return tempQi;
+}
+
 // Unary Operators
 // Support Operators
 QInt& QInt::operator=(const QInt& Qi)
