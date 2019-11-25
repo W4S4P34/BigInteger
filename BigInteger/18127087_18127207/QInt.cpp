@@ -18,24 +18,18 @@ QInt QInt::operator~() {
 QInt QInt::operator+(const QInt& Qi) {
 	bitset<1> temp = { 0 };
 	QInt tempQi;
-	for (int i = 0; i < Qi.arrayBits.size(); i++) {
+	for (int i = Qi.arrayBits.size() - 1; i >= 0; i--) {
 		tempQi.arrayBits[i] = (this->arrayBits[i] ^ Qi.arrayBits[i]);
 		if (this->arrayBits[i] == Qi.arrayBits[i]) {
+			tempQi.arrayBits[i] = tempQi.arrayBits[i] + temp[0];
 			if (Qi.arrayBits[i] == 0) {
 				if (temp[0] == 1) {
-					tempQi.arrayBits[i] = tempQi.arrayBits[i] + temp[0];
 					temp.flip();
 				}
-				else
-					tempQi.arrayBits[i] = tempQi.arrayBits[i] + temp[0];
 			}
 			else {
-				if (temp[0] == 1)
-					tempQi.arrayBits[i] = tempQi.arrayBits[i] + temp[0];
-				else {
-					tempQi.arrayBits[i] = tempQi.arrayBits[i] + temp[0];
+				if (temp[0] == 0)
 					temp.flip();
-				}
 			}
 		}
 		else {
