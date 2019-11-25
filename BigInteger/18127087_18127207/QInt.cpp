@@ -370,20 +370,20 @@ QInt QInt::operator+(const QInt& Qi)
 {
 	bitset<1> temp = { 0 };
 	QInt tempQi;
-	for (int i = (int)Qi.arrayBits.size() - 1; i >= 0; i--) 
+	for (int i = (int)Qi.arrayBits.size() - 1; i >= 0; i--)
 	{
 		tempQi.arrayBits[i] = (this->arrayBits[i] ^ Qi.arrayBits[i]);
-		if (this->arrayBits[i] == Qi.arrayBits[i]) 
+		if (this->arrayBits[i] == Qi.arrayBits[i])
 		{
 			tempQi.arrayBits[i] = tempQi.arrayBits[i] ^ temp[0];
-			if (Qi.arrayBits[i] == 0) 
+			if (Qi.arrayBits[i] == 0)
 			{
 				if (temp[0] == 1)
 				{
 					temp.flip();
 				}
 			}
-			else 
+			else
 			{
 				if (temp[0] == 0)
 					temp.flip();
@@ -402,15 +402,20 @@ QInt QInt::operator+(const QInt& Qi)
 
 // Unary Operators
 // Support Operators
-QInt& QInt::operator=(const QInt& Qi) 
+QInt& QInt::operator=(const QInt& Qi)
 {
-	QInt tempQi;
-	tempQi.arrayBits = Qi.arrayBits;
-	return tempQi;
+	if (this == &Qi) return *this;
+
+	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
+	{
+		this->arrayBits.set(i, Qi.arrayBits[i]);
+	}
+
+	return *this;
 }
 
 // Bitwise
-QInt QInt::operator~() 
+QInt QInt::operator~()
 {
 	QInt tempQi;
 	tempQi.arrayBits.flip();
@@ -419,48 +424,48 @@ QInt QInt::operator~()
 
 // Binary Operators
 // Bitwise
-QInt QInt::operator<<(const int8_t&) 
+QInt QInt::operator<<(const int8_t&)
 {
-	for (int i = this->arrayBits.size() - 1; i >= 0; i--) 
+	for (int i = this->arrayBits.size() - 1; i >= 0; i--)
 	{
 		this->arrayBits[i] << 1;
 	}
 	return *this;
 }
 
-QInt QInt::operator>>(const int8_t&) 
+QInt QInt::operator>>(const int8_t&)
 {
-	for (int i = this->arrayBits.size() - 2; i >= 0; i--) 
+	for (int i = this->arrayBits.size() - 2; i >= 0; i--)
 	{
 		this->arrayBits[i] >> 1;
 	}
 	return *this;
 }
 
-QInt QInt::operator&(const QInt& Qi) 
+QInt QInt::operator&(const QInt& Qi)
 {
 	QInt tempQi;
-	for (int i = 0; i < (int)Qi.arrayBits.size(); i++) 
+	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
 	{
 		tempQi.arrayBits[i] = this->arrayBits[i] & Qi.arrayBits[i];
 	}
 	return tempQi;
 }
 
-QInt QInt::operator|(const QInt& Qi) 
+QInt QInt::operator|(const QInt& Qi)
 {
 	QInt tempQi;
-	for (int i = 0; i < (int)Qi.arrayBits.size(); i++) 
+	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
 	{
 		tempQi.arrayBits[i] = this->arrayBits[i] | Qi.arrayBits[i];
 	}
 	return tempQi;
 }
 
-QInt QInt::operator^(const QInt& Qi) 
+QInt QInt::operator^(const QInt& Qi)
 {
 	QInt tempQi;
-	for (int i = 0; i < (int)Qi.arrayBits.size(); i++) 
+	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
 	{
 		tempQi.arrayBits[i] = this->arrayBits[i] ^ Qi.arrayBits[i];
 	}
