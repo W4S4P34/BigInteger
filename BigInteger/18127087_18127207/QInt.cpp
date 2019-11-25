@@ -53,18 +53,35 @@ QInt QInt::operator-(const QInt& Qi) {
 }
 /// Bitwise
 
-QInt QInt::operator<<(const int8_t&) {
-	for (int i = this->arrayBits.size() - 1; i >= 0; i--) {
-		this->arrayBits[i] << 1;
+QInt QInt::operator<<(const uint8_t& n) {
+	QInt temp = *this;
+	for (int i = 0; i < (int)temp.arrayBits.size(); i++) {
+		if ((i + n) > temp.arrayBits.size() - 1) {
+			temp.arrayBits.set(i, 0);
+			continue;
+		}
+		temp.arrayBits[i] = temp.arrayBits[i + n];
 	}
-	return *this;
+	return temp;
 }
 
-QInt QInt::operator>>(const int8_t&) {
-	for (int i = this->arrayBits.size() - 2; i >= 0; i--) {
-		this->arrayBits[i] >> 1;
+QInt QInt::operator>>(const uint8_t& n) {
+	QInt tempQi = *this;
+	int temp = tempQi.arrayBits[0];
+	int count = 1;
+	int bound = n;
+	if (bound > 127)
+		bound = 127;
+	while (count <= bound) {
+		for (int i = tempQi.arrayBits.size() - 1; i >= 1; i--) {
+			tempQi.arrayBits[i] = tempQi.arrayBits[i - 1];
+		}
+		count++;
 	}
-	return *this;
+	for (int i = count - 1; i >= 0; i--) {
+		tempQi.arrayBits[i] = temp;
+	}
+	return tempQi;
 }
 QInt QInt::operator&(const QInt& Qi) {
 	QInt tempQi;
