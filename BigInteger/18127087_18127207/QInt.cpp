@@ -21,7 +21,7 @@ QInt QInt::operator+(const QInt& Qi) {
 	for (int i = Qi.arrayBits.size() - 1; i >= 0; i--) {
 		tempQi.arrayBits[i] = (this->arrayBits[i] ^ Qi.arrayBits[i]);
 		if (this->arrayBits[i] == Qi.arrayBits[i]) {
-			tempQi.arrayBits[i] = tempQi.arrayBits[i] + temp[0];
+			tempQi.arrayBits[i] = tempQi.arrayBits[i] ^ temp[0];
 			if (Qi.arrayBits[i] == 0) {
 				if (temp[0] == 1) {
 					temp.flip();
@@ -50,6 +50,21 @@ QInt QInt::operator-(const QInt& Qi) {
 	TwoComplement = temp + OneComplement;
 	tempQi = *this + TwoComplement;
 	return tempQi;
+}
+/// Bitwise
+
+QInt QInt::operator<<(const int8_t&) {
+	for (int i = this->arrayBits.size() - 1; i >= 0; i--) {
+		this->arrayBits[i] << 1;
+	}
+	return *this;
+}
+
+QInt QInt::operator>>(const int8_t&) {
+	for (int i = this->arrayBits.size() - 2; i >= 0; i--) {
+		this->arrayBits[i] >> 1;
+	}
+	return *this;
 }
 QInt QInt::operator&(const QInt& Qi) {
 	QInt tempQi;
