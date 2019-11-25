@@ -42,6 +42,7 @@ QInt QInt::operator+(const QInt& Qi) {
 	return tempQi;
 }
 
+//Delete this
 QInt QInt::operator-(const QInt& Qi) {
 	QInt tempQi, OneComplement, temp, TwoComplement;
 	OneComplement = Qi;
