@@ -46,7 +46,7 @@ QInt QInt::operator+(const QInt& Qi) {
 QInt QInt::operator-(const QInt& Qi) {
 	QInt tempQi, OneComplement, temp, TwoComplement;
 	OneComplement = Qi;
-	temp.arrayBits.set(0, 1);
+	temp.arrayBits.set(127, 1);
 	OneComplement.arrayBits.flip();
 	TwoComplement = temp + OneComplement;
 	tempQi = *this + TwoComplement;
