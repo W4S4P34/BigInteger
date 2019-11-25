@@ -43,7 +43,7 @@ public:
 	QInt& operator=(const QInt&);
 
 	// Bitwise
-	QInt operator~();
+	//QInt operator~();
 
 	// Binary Operators
 	// Arithmetic
