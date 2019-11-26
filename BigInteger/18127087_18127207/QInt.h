@@ -1,7 +1,10 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <bitset>
+#include <fstream>
 #include <string>
+#include <cstring>
 
 using namespace std;
 
@@ -16,6 +19,7 @@ public:
 	QInt(const QInt&);
 
 	// Base Conversion Methods
+	void toBase2_2(string base);
 	void toBase2_10(string base);
 	void toBase2_16(string base);
 	string toBase10();
@@ -62,3 +66,5 @@ public:
 	QInt operator| (const QInt&);
 	QInt operator^ (const QInt&);
 };
+
+bool handleFile(string, string);

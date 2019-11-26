@@ -16,6 +16,19 @@ QInt::QInt(const QInt& qi)
 
 /*************************************************************************/
 
+void QInt::toBase2_2(string base)
+{
+	bool isActive = false;
+
+	for (int i = 0; i < (int)base.length(); i++)
+	{
+		if (base[i] == '0') isActive = false;
+		else isActive = true;
+
+		this->arrayBits.set(127 - ((int)base.length() - 1) + i, isActive);
+	}
+}
+
 // Base Conversion Methods
 void QInt::toBase2_10(string base)
 {
@@ -44,23 +57,22 @@ void QInt::toBase2_10(string base)
 		{
 			bool carryBit = false;
 			this->arrayBits.flip();
-			if (this->arrayBits[127] == 0)
+			
+			QInt bitOne; bitOne.toBase2_2("1");
+
+			string tempString = this->arrayBits.to_string();
+			string reversedString;
+
+			for (int i = tempString.length() - 1; i >= 0; i--)
 			{
-				this->arrayBits.set(127, true);
+				reversedString += tempString[i];
 			}
-			else
-			{
-				int i = 127;
-				do
-				{
-					if (this->arrayBits[i] == 1)
-					{
-						carryBit = true;
-						this->arrayBits.set(i, false);
-					}
-					i--;
-				} while (carryBit && i >= 0);
-			}
+
+			QInt current; current.toBase2_2(reversedString);
+
+			QInt twoCompliment = current + bitOne;
+			
+			this->toBase2_2(twoCompliment.getBits());
 		}
 	}
 }
@@ -314,10 +326,10 @@ string QInt::powerOfTwo(int power)
 		int carryElement = 0;
 		int temp = 0;
 
-		while (power != 0)
+		while (power > 0)
 		{
 			stringIndex = 38;
-			while (stringIndex != 0)
+			while (stringIndex >= 0)
 			{
 				temp = 2 * (tempString[stringIndex] - 48) + carryElement;
 
@@ -357,8 +369,8 @@ string QInt::convertBinChunkToHex(string chunk)
 	else if (chunk == "1011") return "B";
 	else if (chunk == "1100") return "C";
 	else if (chunk == "1101") return "D";
-	else if (chunk == "1110") return "F";
-	else if (chunk == "1111") return "G";
+	else if (chunk == "1110") return "E";
+	else if (chunk == "1111") return "F";
 	else return "0";
 }
 
@@ -429,7 +441,7 @@ QInt& QInt::operator=(const QInt& Qi)
 QInt QInt::operator~()
 {
 	QInt tempQi;
-	tempQi.arrayBits.flip();
+	tempQi.arrayBits = this->arrayBits.flip();
 	return tempQi;
 }
 
@@ -438,7 +450,7 @@ QInt QInt::operator<<(const uint8_t& n)
 	QInt temp = *this;
 	for (int i = 0; i < (int)temp.arrayBits.size(); i++)
 	{
-		if ((i + n) > temp.arrayBits.size() - 1)
+		if ((i + n) > (int)temp.arrayBits.size() - 1)
 		{
 			temp.arrayBits.set(i, 0);
 			continue;
@@ -499,4 +511,292 @@ QInt QInt::operator^(const QInt& Qi)
 		tempQi.arrayBits[i] = this->arrayBits[i] ^ Qi.arrayBits[i];
 	}
 	return tempQi;
+}
+
+bool handleFile(string inFile, string outFile)
+{
+	ifstream fin; fin.open(inFile);
+	ofstream fout; fout.open(outFile);
+
+	if (!fin.is_open())
+	{
+		cout << "Can't open file \"" << inFile << "\" or file \"" << outFile << "\"." << endl
+			<< "Please check again!" << endl;
+		return false;
+	}
+
+	string operatorLine;
+
+	while (!fin.eof())
+	{
+		getline(fin, operatorLine);
+
+		size_t found = operatorLine.find(" ", 0);
+		int count = 1;
+
+		while (found != string::npos)
+		{
+			found = operatorLine.find(" ", found + 1);
+			if (found != string::npos) count++;
+		}
+
+		if (count == 2)
+		{
+			string base, op, value;
+			char* nextToken = nullptr;
+
+			char* cstr = new char[operatorLine.length() + 1];
+			strcpy(cstr, operatorLine.c_str());
+
+			char* stringToken = strtok_s(cstr, " ", &nextToken);
+
+			while (stringToken != nullptr)
+			{
+				base.assign(stringToken);
+				stringToken = strtok_s(NULL, " ", &nextToken);
+				op.assign(stringToken);
+				stringToken = strtok_s(NULL, " ", &nextToken);
+				value.assign(stringToken);
+				stringToken = strtok_s(NULL, " ", &nextToken);
+			}
+
+			QInt value_QInt;
+			if (base == "10")
+			{
+				value_QInt.toBase2_10(value);
+			}
+			else if (base == "16")
+			{
+				value_QInt.toBase2_16(value);
+			}
+			else
+			{
+				value_QInt.toBase2_2(value);
+			}
+
+			if (op == "2")
+			{
+				fout << value_QInt.getBits() << endl;
+			}
+			else if (op == "10")
+			{
+				fout << value_QInt.toBase10() << endl;
+			}
+			else if (op == "16")
+			{
+				fout << value_QInt.toBase16() << endl;
+			}
+			else if (op == "~")
+			{
+				QInt tempQInt = ~value_QInt;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
+			}
+			else if (op == "rol")
+			{
+				fout << endl;
+			}
+			else if (op == "ror")
+			{
+				fout << endl;
+			}
+			else
+			{
+				continue;
+			}
+
+			delete[]cstr;
+		}
+		else if (count == 3)
+		{
+			string base, op, value1, value2;
+			char* nextToken = nullptr;
+
+			char* cstr = new char[operatorLine.length() + 1];
+			strcpy(cstr, operatorLine.c_str());
+
+			char* stringToken = strtok_s(cstr, " ", &nextToken);
+
+			while (stringToken != nullptr)
+			{
+				base.assign(stringToken);
+				stringToken = strtok_s(NULL, " ", &nextToken);
+				value1.assign(stringToken);
+				stringToken = strtok_s(NULL, " ", &nextToken);
+				op.assign(stringToken);
+				stringToken = strtok_s(NULL, " ", &nextToken);
+				value2.assign(stringToken);
+				stringToken = strtok_s(NULL, " ", &nextToken);
+			}
+
+			QInt value1_QInt, value2_QInt;
+			if (base == "10")
+			{
+				value1_QInt.toBase2_10(value1);
+				value2_QInt.toBase2_10(value2);
+			}
+			else if (base == "16")
+			{
+				value1_QInt.toBase2_16(value1);
+				value2_QInt.toBase2_16(value2);
+			}
+			else
+			{
+				value1_QInt.toBase2_2(value1);
+				value2_QInt.toBase2_2(value2);
+			}
+
+			if (op == "+")
+			{
+				QInt tempQInt = value1_QInt + value2_QInt;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
+			}
+			else if (op == "-")
+			{
+				QInt tempQInt = value1_QInt - value2_QInt;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
+			}
+			else if (op == "*")
+			{
+				fout << endl;
+			}
+			else if (op == "/")
+			{
+				fout << endl;
+			}
+			else if (op == ">>")
+			{
+				char* cstrShiftingBit = new char[value2.length() + 1];
+				uint8_t shiftingBit = atoi(cstrShiftingBit);
+
+				QInt tempQInt = value1_QInt >> shiftingBit;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
+
+				delete[]cstrShiftingBit;
+			}
+			else if (op == "<<")
+			{
+				char* cstrShiftingBit = new char[value2.length() + 1];
+				uint8_t shiftingBit = atoi(cstrShiftingBit);
+
+				QInt tempQInt = value1_QInt << shiftingBit;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
+
+				delete[]cstrShiftingBit;
+			}
+			else if (op == "&")
+			{
+				QInt tempQInt = value1_QInt & value2_QInt;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
+			}
+			else if (op == "|")
+			{
+				QInt tempQInt = value1_QInt | value2_QInt;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
+			}
+			else if (op == "^")
+			{
+				QInt tempQInt = value1_QInt ^ value2_QInt;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
+			}
+			else
+			{
+				continue;
+			}
+
+			delete[]cstr;
+		}
+		
+		operatorLine.clear();
+	}
+
+	fin.close(); fout.close();
+	return true;
 }
