@@ -622,11 +622,35 @@ bool handleFile(string inFile, string outFile)
 			}
 			else if (op == "rol")
 			{
-				fout << endl;
+				QInt tempQInt; tempQInt = value_QInt.rol();
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
 			}
 			else if (op == "ror")
 			{
-				fout << endl;
+				QInt tempQInt; tempQInt = value_QInt.ror();
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
 			}
 			else
 			{
