@@ -70,9 +70,9 @@ void QInt::toBase2_10(string base)
 
 			QInt current; current.toBase2_2(reversedString);
 
-			QInt twoCompliment = current + bitOne;
+			QInt twoComplement = current + bitOne;
 
-			this->toBase2_2(twoCompliment.getBits());
+			this->toBase2_2(twoComplement.getBits());
 		}
 	}
 }
