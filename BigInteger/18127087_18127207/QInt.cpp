@@ -57,7 +57,7 @@ void QInt::toBase2_10(string base)
 		{
 			bool carryBit = false;
 			this->arrayBits.flip();
-			
+
 			QInt bitOne; bitOne.toBase2_2("1");
 
 			string tempString = this->arrayBits.to_string();
@@ -71,7 +71,7 @@ void QInt::toBase2_10(string base)
 			QInt current; current.toBase2_2(reversedString);
 
 			QInt twoCompliment = current + bitOne;
-			
+
 			this->toBase2_2(twoCompliment.getBits());
 		}
 	}
@@ -412,7 +412,7 @@ QInt QInt::operator+(const QInt& Qi)
 	return tempQi;
 }
 
-QInt QInt::operator-(const QInt& Qi) 
+QInt QInt::operator-(const QInt& Qi)
 {
 	QInt tempQi, OneComplement, temp, TwoComplement;
 	OneComplement = Qi;
@@ -500,6 +500,24 @@ QInt QInt::operator|(const QInt& Qi)
 	{
 		tempQi.arrayBits[i] = this->arrayBits[i] | Qi.arrayBits[i];
 	}
+	return tempQi;
+}
+
+QInt QInt::ror()
+{
+	QInt tempQi;
+	int carryBit = this->arrayBits[127];
+	tempQi = *this >> 1;
+	tempQi.arrayBits.set(0, carryBit);
+	return tempQi;
+}
+
+QInt QInt::rol()
+{
+	QInt tempQi;
+	int carryBit = this->arrayBits[0];
+	tempQi = *this << 1;
+	tempQi.arrayBits.set(127, carryBit);
 	return tempQi;
 }
 
@@ -793,7 +811,7 @@ bool handleFile(string inFile, string outFile)
 
 			delete[]cstr;
 		}
-		
+
 		operatorLine.clear();
 	}
 
