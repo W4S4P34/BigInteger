@@ -448,9 +448,9 @@ QInt QInt::operator~()
 QInt QInt::operator<<(const uint8_t& n)
 {
 	QInt temp = *this;
-	for (int i = 0; i < (int)temp.arrayBits.size(); i++)
+	for (uint8_t i = 0; i < (uint8_t)temp.arrayBits.size(); i++)
 	{
-		if ((i + n) > (int)temp.arrayBits.size() - 1)
+		if ((i + n) > (uint8_t)temp.arrayBits.size() - 1)
 		{
 			temp.arrayBits.set(i, 0);
 			continue;
@@ -741,6 +741,7 @@ bool handleFile(string inFile, string outFile)
 			else if (op == ">>")
 			{
 				char* cstrShiftingBit = new char[value2.length() + 1];
+				strcpy(cstrShiftingBit, value2.c_str());
 				uint8_t shiftingBit = atoi(cstrShiftingBit);
 
 				QInt tempQInt = value1_QInt >> shiftingBit;
@@ -762,6 +763,7 @@ bool handleFile(string inFile, string outFile)
 			else if (op == "<<")
 			{
 				char* cstrShiftingBit = new char[value2.length() + 1];
+				strcpy(cstrShiftingBit, value2.c_str());
 				uint8_t shiftingBit = atoi(cstrShiftingBit);
 
 				QInt tempQInt = value1_QInt << shiftingBit;
