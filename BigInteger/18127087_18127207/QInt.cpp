@@ -25,7 +25,7 @@ void QInt::toBase2_2(string base)
 		if (base[i] == '0') isActive = false;
 		else isActive = true;
 
-		this->arrayBits.set(127 - ((int)base.length() - 1) + i, isActive);
+		this->arrayBits.set((long long int)127 - ((int)base.length() - 1) + i, isActive);
 	}
 }
 
@@ -63,7 +63,7 @@ void QInt::toBase2_10(string base)
 			string tempString = this->arrayBits.to_string();
 			string reversedString;
 
-			for (int i = tempString.length() - 1; i >= 0; i--)
+			for (int i = (int)tempString.length() - 1; i >= 0; i--)
 			{
 				reversedString += tempString[i];
 			}
@@ -85,10 +85,10 @@ void QInt::toBase2_16(string base)
 		bool mode = 0; string tempString;
 		for (int i = 124; i >= (int)(128 - (base.length() * 4)); i -= 4)
 		{
-			tempString = convertOneHexToBin(base[((int)base.length() - 1) - (31 - (i / 4))]);
+			tempString = convertOneHexToBin(base[(long long int)((int)base.length() - 1) - ((long long int)31 - (i / 4))]);
 			for (int j = i; j <= i + 3; j++)
 			{
-				mode = (tempString[j - i] == '1');
+				mode = (tempString[(long long int)j - i] == '1');
 				this->arrayBits.set(j, mode);
 			}
 		}
@@ -103,7 +103,7 @@ string QInt::toBase10()
 	char** conversionTable = new char* [128];
 	for (int i = 0; i < 128; i++)
 	{
-		if (this->arrayBits[127 - i])
+		if (this->arrayBits[(long long int)127 - i])
 		{
 			tempString.assign(powerOfTwo(i));
 		}
@@ -455,7 +455,7 @@ QInt QInt::operator<<(const uint8_t& n)
 			temp.arrayBits.set(i, 0);
 			continue;
 		}
-		temp.arrayBits[i] = temp.arrayBits[i + n];
+		temp.arrayBits[i] = temp.arrayBits[(long long int)i + n];
 	}
 	return temp;
 }
@@ -470,9 +470,9 @@ QInt QInt::operator>>(const uint8_t& n)
 		bound = 127;
 	while (count <= bound)
 	{
-		for (int i = tempQi.arrayBits.size() - 1; i >= 1; i--)
+		for (int i = (int)tempQi.arrayBits.size() - 1; i >= 1; i--)
 		{
-			tempQi.arrayBits[i] = tempQi.arrayBits[i - 1];
+			tempQi.arrayBits[i] = tempQi.arrayBits[(long long int)i - 1];
 		}
 		count++;
 	}
