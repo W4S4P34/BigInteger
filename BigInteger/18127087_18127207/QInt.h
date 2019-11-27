@@ -26,13 +26,12 @@ public:
 
 	// Bitwise
 	QInt operator~();
-
 	// Binary Operators
 	// Arithmetic
 	QInt operator+(const QInt&);
 	QInt operator-(const QInt&);
-	//QInt operator*(const QInt&);
-	//QInt operator/(const QInt&);
+	QInt operator*(const QInt&);
+	QInt operator/(const QInt&);
 
 	//// Bitwise
 	QInt operator<<(const uint8_t&);
@@ -43,4 +42,8 @@ public:
 	QInt operator& (const QInt&);
 	QInt operator| (const QInt&);
 	QInt operator^ (const QInt&);
+
+	// Something new
+	QInt toTwoComplement();
+
 };
