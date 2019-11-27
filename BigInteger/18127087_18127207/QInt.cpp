@@ -473,7 +473,8 @@ QInt QInt::operator-(const QInt& Qi)
 QInt QInt::operator*(const QInt& Qi)
  {
 	QInt tempQi;
-	int countQi = 0;
+	QInt tempThis = *this;
+	int countQi = 0, countThis = 0;
 	for (int i = 0; i < (int)Qi.arrayBits.size(); i++) 
 	{
 		if (Qi.arrayBits[i] == 1)
@@ -481,13 +482,22 @@ QInt QInt::operator*(const QInt& Qi)
 		if (countQi != 0)
 			break;
 	}
+	for (int i = 0; i < (int)tempThis.arrayBits.size(); i++) 
+	{
+		if (this->arrayBits[i] == 1)
+			countThis = ((int)tempThis.arrayBits.size() - 1) - i;
+		if (countThis != 0)
+			break;
+	}
 	QInt temp;
-	for (int i = (int)Qi.arrayBits.size() - 1; i >= ((int)Qi.arrayBits.size() - 1) - countQi; i--)
-	 {
-		if (Qi.arrayBits[i] == 1) 
+	int count = (countQi >= countThis) ? countQi : countThis;
+	for (int i = (int)Qi.arrayBits.size() - 1; i >= ((int)Qi.arrayBits.size() - 1) - count; i--) 
+	{
+		if (Qi.arrayBits[i] == 1)
 		{
-			temp = *this << ((int)Qi.arrayBits.size() - 1) - i;
+			temp = tempThis << ((int)Qi.arrayBits.size() - 1) - i;
 		}
+		else continue;
 		tempQi = tempQi + temp;
 	}
 	return tempQi;
