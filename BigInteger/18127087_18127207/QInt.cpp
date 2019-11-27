@@ -228,6 +228,16 @@ string QInt::toBase16()
 }
 
 // Support Conversion Methods
+// Converter
+QInt QInt::toTwoComplement()
+{
+	QInt tempQi;
+	QInt temp;
+	temp.arrayBits.set(127, 1);
+	tempQi = (~(*this)) + temp;
+	return tempQi;
+}
+
 // Set/Get Property
 string QInt::getBits()
 {
@@ -376,6 +386,43 @@ string QInt::convertBinChunkToHex(string chunk)
 
 /*************************************************************************/
 
+// Unary Operators
+// Support Operators
+QInt& QInt::operator=(const QInt& Qi)
+{
+	if (this == &Qi) return *this;
+
+	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
+	{
+		this->arrayBits.set(i, Qi.arrayBits[i]);
+	}
+
+	return *this;
+}
+
+// Bitwise
+QInt QInt::operator~()
+{
+	QInt tempQi;
+	tempQi.arrayBits = this->arrayBits.flip();
+	return tempQi;
+}
+
+QInt QInt::operator<<(const uint8_t& n)
+{
+	QInt temp = *this;
+	for (uint8_t i = 0; i < (uint8_t)temp.arrayBits.size(); i++)
+	{
+		if ((i + n) > (uint8_t)temp.arrayBits.size() - 1)
+		{
+			temp.arrayBits.set(i, 0);
+			continue;
+		}
+		temp.arrayBits[i] = temp.arrayBits[(long long int)i + n];
+	}
+	return temp;
+}
+
 // Binary Operators
 // Arithmetic
 QInt QInt::operator+(const QInt& Qi)
@@ -423,41 +470,79 @@ QInt QInt::operator-(const QInt& Qi)
 	return tempQi;
 }
 
-// Unary Operators
-// Support Operators
-QInt& QInt::operator=(const QInt& Qi)
-{
-	if (this == &Qi) return *this;
-
-	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
-	{
-		this->arrayBits.set(i, Qi.arrayBits[i]);
-	}
-
-	return *this;
-}
-
-// Bitwise
-QInt QInt::operator~()
-{
+QInt QInt::operator*(const QInt& Qi)
+ {
 	QInt tempQi;
-	tempQi.arrayBits = this->arrayBits.flip();
+	int countQi = 0;
+	for (int i = 0; i < (int)Qi.arrayBits.size(); i++) 
+	{
+		if (Qi.arrayBits[i] == 1)
+			countQi = ((int)Qi.arrayBits.size() - 1) - i;
+		if (countQi != 0)
+			break;
+	}
+	QInt temp;
+	for (int i = (int)Qi.arrayBits.size() - 1; i >= ((int)Qi.arrayBits.size() - 1) - countQi; i--)
+	 {
+		if (Qi.arrayBits[i] == 1) 
+		{
+			temp = *this << ((int)Qi.arrayBits.size() - 1) - i;
+		}
+		tempQi = tempQi + temp;
+	}
 	return tempQi;
 }
 
-QInt QInt::operator<<(const uint8_t& n)
+QInt QInt::operator/(const QInt& Qi) 
 {
-	QInt temp = *this;
-	for (uint8_t i = 0; i < (uint8_t)temp.arrayBits.size(); i++)
-	{
-		if ((i + n) > (uint8_t)temp.arrayBits.size() - 1)
-		{
-			temp.arrayBits.set(i, 0);
-			continue;
+	bool NegaFlag = false;
+	QInt tempDivident = *this, tempDivisor = Qi;
+	if (this->arrayBits[0] == Qi.arrayBits[0])
+	 {
+		if (this->arrayBits[0] == 1)
+		 {
+			tempDivident = tempDivident.toTwoComplement();
+			tempDivisor = tempDivisor.toTwoComplement();
 		}
-		temp.arrayBits[i] = temp.arrayBits[(long long int)i + n];
 	}
-	return temp;
+	else
+	 {
+		NegaFlag = true;
+		if (this->arrayBits[0] == 1) 
+		{
+			tempDivident = tempDivident.toTwoComplement();
+		}
+		else if (Qi.arrayBits[0] == 1) 
+		{
+			tempDivisor = tempDivisor.toTwoComplement();
+		}
+	}
+
+	int NumberOfDividentBits = 128;
+	int Holder;
+	QInt Remainder;
+	while (NumberOfDividentBits > 0) 
+	{
+		Holder = tempDivident.arrayBits[0];
+		tempDivident = tempDivident << 1;
+		Remainder = Remainder << 1;
+		Remainder.arrayBits.set(127, Holder);
+		QInt tempPrevRemainder = Remainder;
+		Remainder = Remainder - tempDivisor;
+		if (Remainder.arrayBits[0] == 0)
+		{
+			tempDivident.arrayBits.set(127, 1);
+		}
+		else 
+		{
+			tempDivident.arrayBits.set(127, 0);
+			Remainder = tempPrevRemainder;
+		}
+		NumberOfDividentBits--;
+	}
+	if (NegaFlag)
+		tempDivident = tempDivident.toTwoComplement();
+	return tempDivident;
 }
 
 QInt QInt::operator>>(const uint8_t& n)
@@ -732,11 +817,35 @@ bool handleFile(string inFile, string outFile)
 			}
 			else if (op == "*")
 			{
-				fout << endl;
+				QInt tempQInt = value1_QInt * value2_QInt;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
 			}
 			else if (op == "/")
 			{
-				fout << endl;
+				QInt tempQInt = value1_QInt / value2_QInt;
+				if (base == "2")
+				{
+					fout << tempQInt.getBits() << endl;
+				}
+				else if (base == "10")
+				{
+					fout << tempQInt.toBase10() << endl;
+				}
+				else if (base == "16")
+				{
+					fout << tempQInt.toBase16() << endl;
+				}
 			}
 			else if (op == ">>")
 			{

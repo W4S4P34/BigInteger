@@ -26,6 +26,9 @@ public:
 	string toBase16();
 
 	// Support Conversion Methods
+	// Converter
+	QInt toTwoComplement();
+	
 	// Set/Get Property
 	string getBits();
 
@@ -48,7 +51,6 @@ public:
 
 	// Bitwise
 	QInt operator~();
-
 	// Binary Operators
 	// Arithmetic
 	QInt operator+(const QInt&);
@@ -66,5 +68,3 @@ public:
 	QInt operator| (const QInt&);
 	QInt operator^ (const QInt&);
 };
-
-bool handleFile(string, string);
