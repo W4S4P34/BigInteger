@@ -1,7 +1,10 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <bitset>
+#include <fstream>
 #include <string>
+#include <cstring>
 
 using namespace std;
 
@@ -16,12 +19,16 @@ public:
 	QInt(const QInt&);
 
 	// Base Conversion Methods
+	void toBase2_2(string base);
 	void toBase2_10(string base);
 	void toBase2_16(string base);
 	string toBase10();
 	string toBase16();
 
 	// Support Conversion Methods
+	// Converter
+	QInt toTwoComplement();
+	
 	// Set/Get Property
 	string getBits();
 
@@ -44,7 +51,6 @@ public:
 
 	// Bitwise
 	QInt operator~();
-
 	// Binary Operators
 	// Arithmetic
 	QInt operator+(const QInt&);
@@ -53,8 +59,8 @@ public:
 	QInt operator/(const QInt&);
 
 	// Bitwise
-	QInt operator<<(const int8_t&);
-	QInt operator>>(const int8_t&);
+	QInt operator<<(const uint8_t&);
+	QInt operator>>(const uint8_t&);
 	QInt rol();
 	QInt ror();
 
@@ -62,3 +68,5 @@ public:
 	QInt operator| (const QInt&);
 	QInt operator^ (const QInt&);
 };
+
+bool handleFile(string inFile, string outFile);
