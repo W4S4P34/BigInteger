@@ -68,3 +68,5 @@ public:
 	QInt operator| (const QInt&);
 	QInt operator^ (const QInt&);
 };
+
+bool handleFile(string inFile, string outFile);
