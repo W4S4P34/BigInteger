@@ -51,6 +51,7 @@ public:
 
 	// Bitwise
 	QInt operator~();
+
 	// Binary Operators
 	// Arithmetic
 	QInt operator+(const QInt&);

@@ -8,6 +8,7 @@ QInt::QInt()
 
 QInt::QInt(const QInt& qi)
 {
+	// Copy bit-by-bit
 	for (int i = 0; i < 128; i++)
 	{
 		this->arrayBits[i] = qi.arrayBits[i];
@@ -15,44 +16,54 @@ QInt::QInt(const QInt& qi)
 }
 
 /*************************************************************************/
-
+// Base Conversion Methods
 void QInt::toBase2_2(string base)
 {
+	// Bit flag
 	bool isActive = false;
 
 	for (int i = 0; i < (int)base.length(); i++)
 	{
+		// Check whether each single bit of the input is on or off
 		if (base[i] == '0') isActive = false;
 		else isActive = true;
 
+		// Set on/off bit
 		this->arrayBits.set((long long int)127 - ((int)base.length() - 1) + i, isActive);
 	}
 }
 
-// Base Conversion Methods
 void QInt::toBase2_10(string base)
 {
+	// If the input equal to 0, return 0
 	if (base == "0") return;
 	else
 	{
+		// Sign flag
 		bool negativeFlag = false;
-		// Erase the minus "-"
+
+		// Erase the minus "-" if there is one
 		if (base[0] == '-')
 		{
 			negativeFlag = true;
 			base.erase(0, 1);
 		}
 
+		// Convert the integer from base 10 o base 2
+		// Divide the value of input by 2 'til it reaches 0
 		int i = 127; bool mode = 0;
 		while (base != "0")
 		{
 			if (i == 0) break;
 
+			// If odd number in the end of the value, return 1, else return 0
 			mode = oddsToOne(base);
 			this->arrayBits.set(i--, mode);
+			// Reassign the string after dividing it by 2
 			base.assign(divideByTwo(base));
 		}
 
+		// If this is a negative integer, convert it into two's complement representation
 		if (negativeFlag)
 		{
 			bool carryBit = false;
@@ -79,13 +90,16 @@ void QInt::toBase2_10(string base)
 
 void QInt::toBase2_16(string base)
 {
+	// If the input equal to 0, return 0
 	if (base == "0") return;
 	else
 	{
+		// Consider each digit of number, return it binary representation 'til reach the last digit
 		bool mode = 0; string tempString;
 		for (int i = 124; i >= (int)(128 - (base.length() * 4)); i -= 4)
 		{
 			tempString = convertOneHexToBin(base[(long long int)((int)base.length() - 1) - ((long long int)31 - (i / 4))]);
+			// Set the binary chunk string to the bitset of QInt
 			for (int j = i; j <= i + 3; j++)
 			{
 				mode = (tempString[(long long int)j - i] == '1');
@@ -132,6 +146,7 @@ string QInt::toBase10()
 		result[i] = carryElement;
 	}
 
+	// If MSB is on, subtract the result from -2^127
 	int temp = 0;
 	carryElement = 0; carryCapacity = 0;
 	if (this->arrayBits[0])
@@ -392,6 +407,7 @@ QInt& QInt::operator=(const QInt& Qi)
 {
 	if (this == &Qi) return *this;
 
+	// Assign each bit of Qi to *this
 	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
 	{
 		this->arrayBits.set(i, Qi.arrayBits[i]);
@@ -403,24 +419,10 @@ QInt& QInt::operator=(const QInt& Qi)
 // Bitwise
 QInt QInt::operator~()
 {
+	// Flip all bits
 	QInt tempQi;
 	tempQi.arrayBits = this->arrayBits.flip();
 	return tempQi;
-}
-
-QInt QInt::operator<<(const uint8_t& n)
-{
-	QInt temp = *this;
-	for (uint8_t i = 0; i < (uint8_t)temp.arrayBits.size(); i++)
-	{
-		if ((i + n) > (uint8_t)temp.arrayBits.size() - 1)
-		{
-			temp.arrayBits.set(i, 0);
-			continue;
-		}
-		temp.arrayBits[i] = temp.arrayBits[(long long int)i + n];
-	}
-	return temp;
 }
 
 // Binary Operators
@@ -431,6 +433,8 @@ QInt QInt::operator+(const QInt& Qi)
 	QInt tempQi;
 	for (int i = (int)Qi.arrayBits.size() - 1; i >= 0; i--)
 	{
+		// XOR bits of each other, then hold the carry-bit for the following operation
+		// In turn, do this 'til reach the end of the shortest bitset
 		tempQi.arrayBits[i] = (this->arrayBits[i] ^ Qi.arrayBits[i]);
 		if (this->arrayBits[i] == Qi.arrayBits[i])
 		{
@@ -461,6 +465,7 @@ QInt QInt::operator+(const QInt& Qi)
 
 QInt QInt::operator-(const QInt& Qi)
 {
+	// Add two's complement bitset to the minuend bitset
 	QInt tempQi, OneComplement, temp, TwoComplement;
 	OneComplement = Qi;
 	temp.arrayBits.set(127, 1);
@@ -475,6 +480,8 @@ QInt QInt::operator*(const QInt& Qi)
 	QInt tempQi;
 	QInt tempThis = *this;
 	int countQi = 0, countThis = 0;
+
+	// Count the length of bitsets
 	for (int i = 0; i < (int)Qi.arrayBits.size(); i++) 
 	{
 		if (Qi.arrayBits[i] == 1)
@@ -489,8 +496,13 @@ QInt QInt::operator*(const QInt& Qi)
 		if (countThis != 0)
 			break;
 	}
+
 	QInt temp;
+
+	// Choose the longer bitset
 	int count = (countQi >= countThis) ? countQi : countThis;
+
+	// Do the Standard Long Multiplication
 	for (int i = (int)Qi.arrayBits.size() - 1; i >= ((int)Qi.arrayBits.size() - 1) - count; i--) 
 	{
 		if (Qi.arrayBits[i] == 1)
@@ -505,6 +517,8 @@ QInt QInt::operator*(const QInt& Qi)
 
 QInt QInt::operator/(const QInt& Qi) 
 {
+	// Check whether this is a negative or positive number
+	// Convert it into the positive number if it is a negative number
 	bool NegaFlag = false;
 	QInt tempDivident = *this, tempDivisor = Qi;
 	if (this->arrayBits[0] == Qi.arrayBits[0])
@@ -528,17 +542,35 @@ QInt QInt::operator/(const QInt& Qi)
 		}
 	}
 
+	// Initialized with corresponding values
 	int NumberOfDividentBits = 128;
 	int Holder;
 	QInt Remainder;
 	while (NumberOfDividentBits > 0) 
 	{
+		// Dividend: tempDividend; Divisor: tempDivisor; Remainder: Remainder
+		// Using Restoring Division Algorithm For Unsigned Integer
+		// 1. The content of Remainder and Dividend is shifted right as if they are a single unit
+		// 2. The content of Divisor is subtracted from Remainder and result is stored in Remainder
+		// 3. The MSB of the Remainder is checked 
+		// if it is 0, the LSB of Dividend is set to 1,
+		// otherwise if it is 1 the LSB of Dividend is set to 0 
+		// and value of Remainder is restored 
+		// i.e the value of Remainder before the subtraction with Divisor
+		// 4. The value of counter n is decremented
+		// 5. If the value of NumberOfDividentBits becomes zero 
+		// we get off the loop otherwise we repeat from step 1
+		// 6. Finally, the Diviend contain the quotient and Remainder contain remainder
+
 		Holder = tempDivident.arrayBits[0];
 		tempDivident = tempDivident << 1;
 		Remainder = Remainder << 1;
+
 		Remainder.arrayBits.set(127, Holder);
+
 		QInt tempPrevRemainder = Remainder;
 		Remainder = Remainder - tempDivisor;
+		
 		if (Remainder.arrayBits[0] == 0)
 		{
 			tempDivident.arrayBits.set(127, 1);
@@ -548,21 +580,30 @@ QInt QInt::operator/(const QInt& Qi)
 			tempDivident.arrayBits.set(127, 0);
 			Remainder = tempPrevRemainder;
 		}
+
 		NumberOfDividentBits--;
 	}
+
+	// If this is negative number, convert it into the two's complement representation
 	if (NegaFlag)
 		tempDivident = tempDivident.toTwoComplement();
 	return tempDivident;
 }
 
+// Bitwise
 QInt QInt::operator>>(const uint8_t& n)
 {
 	QInt tempQi = *this;
 	int temp = tempQi.arrayBits[0];
 	int count = 1;
 	int bound = n;
+
+	// If shift more than 128 bits, if will maintain the state as shifting 127 bits
 	if (bound > 127)
 		bound = 127;
+
+	// Split bitset into 2 partitions
+	// For the first one, we shift all to the right for "count" times
 	while (count <= bound)
 	{
 		for (int i = (int)tempQi.arrayBits.size() - 1; i >= 1; i--)
@@ -571,6 +612,8 @@ QInt QInt::operator>>(const uint8_t& n)
 		}
 		count++;
 	}
+
+	// For the second, assign exact each shifting bit to the value of MSB
 	for (int i = count - 1; i >= 0; i--)
 	{
 		tempQi.arrayBits[i] = temp;
@@ -578,9 +621,27 @@ QInt QInt::operator>>(const uint8_t& n)
 	return tempQi;
 }
 
+QInt QInt::operator<<(const uint8_t& n)
+{
+	// Assign the following n bits value to each bit indicated
+	QInt temp = *this;
+	for (uint8_t i = 0; i < (uint8_t)temp.arrayBits.size(); i++)
+	{
+		// If out of range, assign 0 to current bit
+		if ((i + n) > (uint8_t)temp.arrayBits.size() - 1)
+		{
+			temp.arrayBits.set(i, 0);
+			continue;
+		}
+		temp.arrayBits[i] = temp.arrayBits[(long long int)i + n];
+	}
+	return temp;
+}
+
 QInt QInt::operator&(const QInt& Qi)
 {
 	QInt tempQi;
+	// AND bit-by-bit
 	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
 	{
 		tempQi.arrayBits[i] = this->arrayBits[i] & Qi.arrayBits[i];
@@ -590,6 +651,7 @@ QInt QInt::operator&(const QInt& Qi)
 
 QInt QInt::operator|(const QInt& Qi)
 {
+	// OR bit-by-bit
 	QInt tempQi;
 	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
 	{
@@ -600,6 +662,7 @@ QInt QInt::operator|(const QInt& Qi)
 
 QInt QInt::ror()
 {
+	// Shift once then assign the LSB to the first bit
 	QInt tempQi;
 	int carryBit = this->arrayBits[127];
 	tempQi = *this >> 1;
@@ -609,6 +672,7 @@ QInt QInt::ror()
 
 QInt QInt::rol()
 {
+	// Shift once then assign the MSB to the last bit
 	QInt tempQi;
 	int carryBit = this->arrayBits[0];
 	tempQi = *this << 1;
@@ -618,6 +682,7 @@ QInt QInt::rol()
 
 QInt QInt::operator^(const QInt& Qi)
 {
+	// XOR bit-by-bit
 	QInt tempQi;
 	for (int i = 0; i < (int)Qi.arrayBits.size(); i++)
 	{
